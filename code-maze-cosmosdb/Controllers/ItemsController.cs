@@ -20,40 +20,41 @@ namespace code_maze_cosmosdb.Controllers
 
         // GET api/items
         [HttpGet]
-        public async Task<IEnumerable<Item>> List()
+        public async Task<IActionResult> List()
         {
-            return await _cosmosDbService.GetMultipleAsync("SELECT * FROM c");
+            return Ok(await _cosmosDbService.GetMultipleAsync("SELECT * FROM c"));
         }
 
         // GET api/items/5
         [HttpGet("{id}")]
-        public async Task<Item> Get(string id)
+        public async Task<IActionResult> Get(string id)
         {
-            return await _cosmosDbService.GetAsync(id);
+            return Ok(await _cosmosDbService.GetAsync(id));
         }
 
         // POST api/items
         [HttpPost]
-        public async Task<string> Create([FromBody] Item item)
+        public async Task<IActionResult> Create([FromBody] Item item)
         {
             item.Id = Guid.NewGuid().ToString();
             await _cosmosDbService.AddAsync(item);
-            return item.Id;
+            return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
         }
 
         // PUT api/items/5
         [HttpPut("{id}")]
-        public async Task<Item> Edit([FromBody] Item item)
+        public async Task<IActionResult> Edit([FromBody] Item item)
         {
             await _cosmosDbService.UpdateAsync(item.Id, item);
-            return item;
+            return NoContent();
         }
 
         // DELETE api/items/5
         [HttpDelete("{id}")]
-        public async void Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             await _cosmosDbService.DeleteAsync(id);
+            return NoContent();
         }
     }
 }

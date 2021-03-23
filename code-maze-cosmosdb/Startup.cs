@@ -41,7 +41,7 @@ namespace code_maze_cosmosdb
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();            
+                app.UseDeveloperExceptionPage();
             }
 
             app.UseSwagger();
@@ -65,15 +65,16 @@ namespace code_maze_cosmosdb
         /// <returns></returns>
         private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
         {
-            string databaseName = configurationSection.GetSection("DatabaseName").Value;
-            string containerName = configurationSection.GetSection("ContainerName").Value;
-            string account = configurationSection.GetSection("Account").Value;
-            string key = configurationSection.GetSection("Key").Value;
-            Microsoft.Azure.Cosmos.CosmosClient client = new Microsoft.Azure.Cosmos.CosmosClient(account, key);
-            CosmosDbService cosmosDbService = new CosmosDbService(client, databaseName, containerName);
-            Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
+            var databaseName = configurationSection["DatabaseName"];
+            var containerName = configurationSection["ContainerName"];
+            var account = configurationSection["Account"];
+            var key = configurationSection["Key"];
+
+            var client = new Microsoft.Azure.Cosmos.CosmosClient(account, key);
+            var database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
             await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
 
+            var cosmosDbService = new CosmosDbService(client, databaseName, containerName);
             return cosmosDbService;
         }
     }
